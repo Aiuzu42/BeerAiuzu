@@ -34,3 +34,23 @@ func PostBeer(c *gin.Context) {
 	}
 	c.Writer.WriteHeader(http.StatusCreated)
 }
+
+func GetBeer(c *gin.Context) {
+	id := c.Param("ID")
+	b, apiErr := business.BeerDetails(id)
+	if apiErr != nil {
+		c.JSON(apiErr.Status, apiErr)
+		return
+	}
+	c.JSON(http.StatusOK, b)
+}
+
+func DeleteBeer(c *gin.Context) {
+	id := c.Param("ID")
+	apiErr := business.DeleteBeer(id)
+	if apiErr != nil {
+		c.JSON(apiErr.Status, apiErr)
+		return
+	}
+	c.Writer.WriteHeader(http.StatusOK)
+}

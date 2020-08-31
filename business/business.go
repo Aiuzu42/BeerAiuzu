@@ -2,6 +2,7 @@ package business
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/aiuzu42/BeerAiuzu/models"
 	"github.com/aiuzu42/BeerAiuzu/storage"
@@ -26,6 +27,38 @@ func AddBeer(beer models.Beer) *models.ApiError {
 		return err
 	}
 	return impl.AddBeer(beer)
+}
+
+func BeerDetails(id string) (models.Beer, *models.ApiError) {
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		return models.Beer{}, &models.ApiError{Message: "Wrong parameters", Status: http.StatusBadRequest}
+	}
+	b, errImpl := impl.BeerDetails(idInt)
+	if errImpl != nil {
+		return models.Beer{}, errImpl
+	}
+	if b.ID == 0 {
+		return models.Beer{}, &models.ApiError{Message: "Not found", Status: http.StatusNotFound}
+	} else {
+		return b, nil
+	}
+}
+
+func DeleteBeer(id string) *models.ApiError {
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		return &models.ApiError{Message: "Wrong parameters", Status: http.StatusBadRequest}
+	}
+	b, errImpl := impl.DeleteBeer(idInt)
+	if err != nil {
+		return errImpl
+	}
+	if !b {
+		return &models.ApiError{Message: "Not found", Status: http.StatusNotFound}
+	} else {
+		return nil
+	}
 }
 
 func validateBeer(beer models.Beer) *models.ApiError {
